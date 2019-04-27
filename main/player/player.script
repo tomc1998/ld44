@@ -1,0 +1,42 @@
+local WALK_SPEED = 100
+
+function on_input(self, action_id, action)
+   if action_id == hash("walk-left") then self.vx = -WALK_SPEED
+   elseif action_id == hash("walk-right") then self.vx = WALK_SPEED
+   end
+   if action_id == hash("walk-up") then self.vy = WALK_SPEED
+   elseif action_id == hash("walk-down") then self.vy = -WALK_SPEED
+   end
+end
+
+function update(self, dt)
+   local pos = go.get_position()
+   go.set_position(vmath.vector3(pos.x + dt * self.vx, pos.y + dt * self.vy, pos.z))
+   -- Set animation
+   local old_anim = self.curr_anim
+   if self.vx > 0 then
+      self.curr_anim = "walk_right"
+   elseif self.vx < 0 then
+      self.curr_anim = "walk_left"
+   elseif self.vy > 0 then
+      self.curr_anim = "walk_up"
+   elseif self.vy < 0 then
+      self.curr_anim = "walk_down"
+   else
+      self.curr_anim = self.curr_anim:gsub("walk", "idle")
+   end
+   if self.curr_anim ~= old_anim then
+      sprite.play_flipbook(self.sprite_url, self.curr_anim)
+   end
+   -- Reset vel
+   self.vx = 0
+   self.vy = 0
+end
+
+function init(self)
+   self.vx = 0.0
+   self.vy = 0.0
+   self.sprite_url = msg.url("#sprite")
+   self.curr_anim = "idle_down"
+   msg.post('.', 'acquire_input_focus')
+end

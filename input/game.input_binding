@@ -1,3 +1,19 @@
+key_trigger {
+  input: KEY_W
+  action: "walk-up"
+}
+key_trigger {
+  input: KEY_A
+  action: "walk-left"
+}
+key_trigger {
+  input: KEY_S
+  action: "walk-down"
+}
+key_trigger {
+  input: KEY_D
+  action: "walk-right"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_1
   action: "touch"
