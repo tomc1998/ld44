@@ -30,6 +30,8 @@ function on_input(self, action_id, action)
       if p then msg.post(p.p, "water", {}) end
       local pos = go.get_position(self.selected.p)
       factory.create("#splash_factory", vmath.vector3(pos.x, pos.y, 0.375))
+   elseif action_id == hash("harvest") and self.selected then
+      msg.post(self.selected.p, "harvest", {})
    end
 end
 

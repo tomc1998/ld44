@@ -85,7 +85,7 @@ function update(self)
     -- render GUI
     --
     render.set_view(vmath.matrix4())
-    render.set_projection(vmath.matrix4_orthographic(0, render.get_window_width(), 0, render.get_window_height(), -1, 1))
+    render.set_projection(vmath.matrix4_orthographic(0, constants.SCALE * render.get_window_width(), 0, constants.SCALE * render.get_window_height(), -1, 1))
 
     render.enable_state(render.STATE_STENCIL_TEST)
     render.draw(self.gui_pred)

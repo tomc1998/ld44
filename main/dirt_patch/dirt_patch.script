@@ -1,4 +1,5 @@
 local constants = require "main.constants"
+local state = require "main.state"
 
 local SECONDS_FOR_BAR_DISAPPEAR = 3.0
 
@@ -7,13 +8,18 @@ function get_bush_growth_rate(bush_type)
    assert(false, "Unknown bush type")
 end
 
+function get_bush_value(bush_type)
+   if bush_type == constants.BUSH_TYPE_RED then return 4 end
+   assert(false, "Unknown bush type")
+end
+
+
 function create_bush(self, bush_type)
    self.bush_type = bush_type
    self.bush_growth = 0
    if bush_type == constants.BUSH_TYPE_RED then
       self.bush = factory.create(self.red_currant_factory, vmath.vector3(go.get_position().x, go.get_position().y, 0.25))
       self.bush_sprite = msg.url(nil, self.bush, "sprite")
-      print(self.bush_sprite)
    else
       assert(false, "Unknown bush type")
    end
@@ -28,11 +34,24 @@ function inc_water_level(self, num)
    sprite.set_constant("#sprite", "tint", vmath.vector4(tint, tint, tint, 1.0))
 end
 
+function harvest(self)
+   if self.bush_growth == nil or self.bush == nil then return end
+   if self.bush_growth < 3 then return end
+   local multiplier = 1
+   if math.floor(self.bush_growth) == 3 then multiplier = 0.5 end
+   state.money = state.money + get_bush_value(self.bush_type) * multiplier
+   go.delete(self.bush)
+   self.bush = nil
+   self.bush_type = nil
+end
+
 function on_message(self, id, msg, sender)
    if id == hash("plant") and self.bush == nil then
       create_bush(self, msg.bush_type)
    elseif id == hash("water") then
       inc_water_level(self, constants.MAX_WATER_LEVEL / 10)
+   elseif id == hash("harvest") then
+      harvest(self)
    end
 end
 
