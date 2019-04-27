@@ -17,7 +17,12 @@ function on_input(self, action_id, action)
       if action.pressed and self.selected then
          msg.post(self.selected, "plant", { bush_type = constants.BUSH_TYPE_RED })
       end
-
+   elseif action_id == hash("water") then
+      if action.pressed and self.selected then
+         msg.post(self.selected, "water", {})
+         local pos = go.get_position(self.selected)
+         factory.create("#splash_factory", vmath.vector3(pos.x, pos.y, 0.375))
+      end
    end
 end
 
@@ -52,14 +57,17 @@ function update(self, dt)
    self.vx = 0
    self.vy = 0
    local dir = direction.dirv(self.facing)
-   local focus = vmath.vector3(pos.x + dir.x * 4 - 8, pos.y + dir.y * 4 - 8, 0.0)
+   local focus = vmath.vector3(pos.x + dir.x * 12, pos.y + dir.y * 12, 0.0)
    self.selected = nil
+   local min_dis = 10000
    for ii = 1,#dirt_patch_repo.patches do
       local dpos = go.get_position(dirt_patch_repo.patches[ii])
       local dx = focus.x - dpos.x
       local dy = focus.y - dpos.y
-      if math.abs(dx) < 16 and math.abs(dy) < 16 then
+      local dis = (math.abs(dx) + math.abs(dy)) / 2
+      if math.abs(dx) < 16 and math.abs(dy) < 16 and dis < min_dis then
          self.selected = dirt_patch_repo.patches[ii]
+         min_dis = dis
       end
    end
    if self.selected == nil then msg.post("/selection", "hide")
