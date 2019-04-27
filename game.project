@@ -11,3 +11,7 @@ height = 640
 [project]
 title = ludum-dare-44
 
+[graphics]
+default_texture_min_filter = nearest
+default_texture_mag_filter = nearest
+
