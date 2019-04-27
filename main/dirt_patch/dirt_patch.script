@@ -1,9 +1,17 @@
 local constants = require "main.constants"
 
+function get_bush_growth_rate(bush_type)
+   if bush_type == constants.BUSH_TYPE_RED then return 1.0 end
+   assert(false, "Unknown bush type")
+end
+
 function create_bush(self, bush_type)
    self.bush_type = bush_type
+   self.bush_growth = 0
    if bush_type == constants.BUSH_TYPE_RED then
       self.bush = factory.create(self.red_currant_factory, vmath.vector3(go.get_position().x, go.get_position().y, 0.25))
+      self.bush_sprite = msg.url(nil, self.bush, "sprite")
+      print(self.bush_sprite)
    else
       assert(false, "Unknown bush type")
    end
@@ -28,6 +36,12 @@ end
 
 function update(self, dt)
    inc_water_level(self, -1)
+   if self.bush then
+      local saturation = self.water_level / constants.MAX_WATER_LEVEL
+      self.bush_growth = math.min(self.bush_growth + dt * saturation * get_bush_growth_rate(self.bush_type), 4.0)
+      local growth_stage = math.floor(self.bush_growth)
+      sprite.play_flipbook(self.bush_sprite, tostring(growth_stage))
+   end
 end
 
 function init(self)
