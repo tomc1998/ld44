@@ -1,0 +1,22 @@
+local dirt_patch_repo = require "main.dirt_patch_repo"
+local constants = require "main.constants"
+
+function create_bush(self, bush_type)
+   self.bush_type = bush_type
+   if bush_type == constants.BUSH_TYPE_RED then
+      self.bush = factory.create(self.red_currant_factory, vmath.vector3(go.get_position().x, go.get_position().y, 0.25))
+   else
+      assert(false, "Unknown bush type")
+   end
+end
+
+function on_message(self, id, msg, sender)
+   if id == hash("plant") and self.bush == nil then
+      create_bush(self, msg.bush_type)
+   end
+end
+
+function init(self)
+   self.red_currant_factory = msg.url("#red-currant-factory")
+   dirt_patch_repo:add_patch(msg.url())
+end

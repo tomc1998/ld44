@@ -1,0 +1,9 @@
+local render = require "main.render"
+
+function init(self)
+   for x = 0,4 do
+      for y = 0,4 do
+         factory.create("#factory", vmath.vector3(render.get_width()/2 - 32 + x * 16, render.get_height()/2 + y * 16 - 32, 0.0))
+      end
+   end
+end

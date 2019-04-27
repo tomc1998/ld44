@@ -1,0 +1,8 @@
+
+function on_message(self, id, message, sender)
+   if id == hash("show") then
+      msg.post("#sprite", "enable")
+      --print(message.pos.x, message.pos.y)
+      go.set_position(vmath.vector3(message.pos.x, message.pos.y, 0.5))
+   elseif id == hash("hide") then msg.post("#sprite", "disable") end
+end

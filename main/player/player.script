@@ -1,4 +1,7 @@
+local dirt_patch_repo = require "main.dirt_patch_repo"
+local direction = require "main.direction"
 local render_m = require "main.render"
+local constants = require "main.constants"
 
 local WALK_SPEED = 60
 
@@ -8,6 +11,13 @@ function on_input(self, action_id, action)
    end
    if action_id == hash("walk-up") then self.vy = WALK_SPEED
    elseif action_id == hash("walk-down") then self.vy = -WALK_SPEED
+   end
+
+   if action_id == hash("plant") then
+      if action.pressed and self.selected then
+         msg.post(self.selected, "plant", { bush_type = constants.BUSH_TYPE_RED })
+      end
+
    end
 end
 
@@ -22,12 +32,16 @@ function update(self, dt)
    local old_anim = self.curr_anim
    if self.vx > 0 then
       self.curr_anim = "walk_right"
+      self.facing = direction.RIGHT
    elseif self.vx < 0 then
       self.curr_anim = "walk_left"
+      self.facing = direction.LEFT
    elseif self.vy > 0 then
       self.curr_anim = "walk_up"
+      self.facing = direction.UP
    elseif self.vy < 0 then
       self.curr_anim = "walk_down"
+      self.facing = direction.DOWN
    else
       self.curr_anim = self.curr_anim:gsub("walk", "idle")
    end
@@ -37,6 +51,20 @@ function update(self, dt)
    -- Reset vel
    self.vx = 0
    self.vy = 0
+   local dir = direction.dirv(self.facing)
+   local focus = vmath.vector3(pos.x + dir.x * 4 - 8, pos.y + dir.y * 4 - 8, 0.0)
+   self.selected = nil
+   for ii = 1,#dirt_patch_repo.patches do
+      local dpos = go.get_position(dirt_patch_repo.patches[ii])
+      local dx = focus.x - dpos.x
+      local dy = focus.y - dpos.y
+      if math.abs(dx) < 16 and math.abs(dy) < 16 then
+         self.selected = dirt_patch_repo.patches[ii]
+      end
+   end
+   if self.selected == nil then msg.post("/selection", "hide")
+   else msg.post("/selection", "show", { pos = go.get_position(self.selected) })
+   end
 end
 
 function init(self)
@@ -44,5 +72,7 @@ function init(self)
    self.vy = 0.0
    self.sprite_url = msg.url("#sprite")
    self.curr_anim = "idle_down"
+   self.facing = direction.DOWN
+   self.selection_box = nil
    msg.post('.', 'acquire_input_focus')
 end
