@@ -14,7 +14,7 @@ components {
   }
 }
 embedded_components {
-  id: "dirt"
+  id: "sprite"
   type: "sprite"
   data: "tile_set: \"/assets/static.atlas\"\n"
   "default_animation: \"dirt\"\n"

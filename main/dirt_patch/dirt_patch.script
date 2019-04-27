@@ -1,4 +1,3 @@
-local dirt_patch_repo = require "main.dirt_patch_repo"
 local constants = require "main.constants"
 
 function create_bush(self, bush_type)
@@ -10,13 +9,28 @@ function create_bush(self, bush_type)
    end
 end
 
+function inc_water_level(self, num)
+   self.water_level = self.water_level + num
+   if self.water_level > constants.MAX_WATER_LEVEL then self.water_level = constants.MAX_WATER_LEVEL end
+   if self.water_level < 0 then self.water_level = 0 end
+   local saturation = self.water_level / constants.MAX_WATER_LEVEL
+   local tint = 1.0 - 0.5 * saturation
+   sprite.set_constant("#sprite", "tint", vmath.vector4(tint, tint, tint, 1.0))
+end
+
 function on_message(self, id, msg, sender)
    if id == hash("plant") and self.bush == nil then
       create_bush(self, msg.bush_type)
+   elseif id == hash("water") then
+      inc_water_level(self, constants.MAX_WATER_LEVEL / 10)
    end
 end
 
+function update(self, dt)
+   inc_water_level(self, -1)
+end
+
 function init(self)
+   self.water_level = 0
    self.red_currant_factory = msg.url("#red-currant-factory")
-   dirt_patch_repo:add_patch(msg.url())
 end

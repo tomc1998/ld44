@@ -1,4 +1,6 @@
 return {
    SCALE = 4.0,
-   BUSH_TYPE_RED,
+   BUSH_TYPE_RED = 0,
+   MAX_WATER_LEVEL = 400,
+   WATER_RELOAD_TIME = 0.1,
 }

@@ -15,14 +15,21 @@ function on_input(self, action_id, action)
 
    if action_id == hash("plant") then
       if action.pressed and self.selected then
-         msg.post(self.selected, "plant", { bush_type = constants.BUSH_TYPE_RED })
+         msg.post(self.selected.p, "plant", { bush_type = constants.BUSH_TYPE_RED })
       end
-   elseif action_id == hash("water") then
-      if action.pressed and self.selected then
-         msg.post(self.selected, "water", {})
-         local pos = go.get_position(self.selected)
-         factory.create("#splash_factory", vmath.vector3(pos.x, pos.y, 0.375))
-      end
+   elseif action_id == hash("water") and self.water_reload <= 0 and self.selected then
+      self.water_reload = constants.WATER_RELOAD_TIME
+      msg.post(self.selected.p, "water", {})
+      local p = dirt_patch_repo:find_patch(self.selected.x+1, self.selected.y)
+      if p then msg.post(p.p, "water", {}) end
+      p = dirt_patch_repo:find_patch(self.selected.x-1, self.selected.y)
+      if p then msg.post(p.p, "water", {}) end
+      p = dirt_patch_repo:find_patch(self.selected.x, self.selected.y+1)
+      if p then msg.post(p.p, "water", {}) end
+      p = dirt_patch_repo:find_patch(self.selected.x, self.selected.y-1)
+      if p then msg.post(p.p, "water", {}) end
+      local pos = go.get_position(self.selected.p)
+      factory.create("#splash_factory", vmath.vector3(pos.x, pos.y, 0.375))
    end
 end
 
@@ -34,6 +41,7 @@ function update(self, dt)
    if pos.y < 0 then pos.y = 0 elseif pos.y > render_m.get_height() then pos.y = render_m.get_height() end
    go.set_position(vmath.vector3(pos.x + dt * self.vx, pos.y + dt * self.vy, pos.z))
    -- Set animation
+   if self.water_reload > 0 then self.water_reload = self.water_reload - dt end
    local old_anim = self.curr_anim
    if self.vx > 0 then
       self.curr_anim = "walk_right"
@@ -61,7 +69,7 @@ function update(self, dt)
    self.selected = nil
    local min_dis = 10000
    for ii = 1,#dirt_patch_repo.patches do
-      local dpos = go.get_position(dirt_patch_repo.patches[ii])
+      local dpos = go.get_position(dirt_patch_repo.patches[ii].p)
       local dx = focus.x - dpos.x
       local dy = focus.y - dpos.y
       local dis = (math.abs(dx) + math.abs(dy)) / 2
@@ -71,11 +79,12 @@ function update(self, dt)
       end
    end
    if self.selected == nil then msg.post("/selection", "hide")
-   else msg.post("/selection", "show", { pos = go.get_position(self.selected) })
+   else msg.post("/selection", "show", { pos = go.get_position(self.selected.p) })
    end
 end
 
 function init(self)
+   self.water_reload = 0
    self.vx = 0.0
    self.vy = 0.0
    self.sprite_url = msg.url("#sprite")
