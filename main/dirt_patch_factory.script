@@ -2,10 +2,38 @@ local dirt_patch_repo = require "main.dirt_patch_repo"
 local render = require "main.render"
 
 function init(self)
-   for x = 0,4 do
-      for y = 0,4 do
-         local p = factory.create("#factory", vmath.vector3(render.get_width()/2 - 32 + x * 16, render.get_height()/2 + y * 16 - 32, 0.0))
+   local w = 6
+   local h = 6
+   for x = 1,w do
+      for y = 1,h do
+         local p = factory.create("#factory", vmath.vector3(render.get_width()/2 - 16 * (w+1) / 2 + x * 16,
+                                                            render.get_height()/2 - 16 * (h+1) / 2 + y * 16, 0.0))
          dirt_patch_repo:add_patch(p, x, y)
+         -- Change the sprite based on positioning in the image
+         local l = x == 1
+         local r = x == w
+         local t = y == h
+         local b = y == 1
+         local ix = nil
+         if l then
+            if t then ix = 0
+            elseif b then ix = 6
+            else ix = 3
+            end
+         elseif r then
+            if t then ix = 2
+            elseif b then ix = 8
+            else ix = 5
+            end
+         else
+            if t then ix = 1
+            elseif b then ix = 7
+            else ix = 4
+            end
+         end
+         assert(ix)
+         local p_sprite = msg.url(nil, p, "sprite")
+         sprite.play_flipbook(p_sprite, tostring(ix))
       end
    end
 end

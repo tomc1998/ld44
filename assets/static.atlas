@@ -1,7 +1,4 @@
 images {
-  image: "/assets/sprites/dirt.png"
-}
-images {
   image: "/assets/sprites/selection.png"
 }
 margin: 0
