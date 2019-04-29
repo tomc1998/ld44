@@ -1,0 +1,10 @@
+
+function on_input(self, action_id, action)
+   if action.pressed then
+      msg.post("default:/controller", "load_game")
+   end
+end
+
+function init(self)
+   msg.post(".", "acquire_input_focus")
+end

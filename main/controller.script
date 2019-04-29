@@ -1,0 +1,28 @@
+function load_other(self, scene)
+   if self.currently_loaded then
+      msg.post(self.currently_loaded, "disable")
+      msg.post(self.currently_loaded, "final")
+      msg.post(self.currently_loaded, "unload")
+   end
+   msg.post(scene, "load")
+end
+
+function on_message(self, message_id, message, sender)
+   if message_id == hash("proxy_loaded") then
+      self.currently_loaded = sender
+      msg.post(sender, "enable")
+   elseif message_id == hash("load_shop") then
+      load_other(self, "#shop_screen")
+   elseif message_id == hash("load_game_over") then
+      load_other(self, "#game_over_screen")
+   elseif message_id == hash("load_main") then
+      load_other(self, "#main_screen")
+   elseif message_id == hash("load_game") then
+      load_other(self, "#game")
+   end
+end
+
+function init(self)
+   msg.post('.', 'acquire_input_focus')
+   msg.post("#shop_screen", "load")
+end

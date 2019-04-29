@@ -1,0 +1,68 @@
+local state = require "main.state"
+
+function init(self)
+   msg.post(".", "acquire_input_focus")
+   self.nodes = { {name="red_select", in_cart=0, cost=100},
+      {name="blue_select", in_cart=0, cost=200},
+      {name="white_select", in_cart=0, cost=300}, }
+   self.selected = 1
+   update_selected(self)
+end
+
+function cart_cost(self)
+   local sum = 0
+   for ii = 1,#self.nodes do
+      sum = sum + self.nodes[ii].cost * self.nodes[ii].in_cart
+   end
+   return sum
+end
+
+function update_selected(self)
+   for ii = 1,#self.nodes do
+      if self.selected == ii then
+         gui.set_enabled(gui.get_node(self.nodes[ii].name .. "/selection"), true)
+      else
+         gui.set_enabled(gui.get_node(self.nodes[ii].name .. "/selection"), false)
+      end
+      gui.set_text(gui.get_node(self.nodes[ii].name .. "/text"), self.nodes[ii].in_cart)
+   end
+
+   if self.selected > #self.nodes then
+      gui.set_color(gui.get_node("purchase_button"), vmath.vector3(0, 1, 0))
+   else
+      gui.set_color(gui.get_node("purchase_button"), vmath.vector3(1, 1, 1))
+   end
+
+   gui.set_text(gui.get_node("money"), tostring(state.money - cart_cost(self)) .. " $")
+end
+
+function on_input(self, action_id, action)
+   if action_id == hash("walk-up") and action.pressed then
+      self.selected = self.selected - 1
+      if self.selected == 0 then self.selected = 1 end
+   elseif action_id == hash("walk-down") and action.pressed then
+      self.selected = self.selected + 1
+      if self.selected > (#self.nodes+1) then self.selected = #self.nodes end
+   elseif action_id == hash("walk-left") and action.pressed then
+      if self.selected <= #self.nodes then
+        self.nodes[self.selected].in_cart = self.nodes[self.selected].in_cart - 1
+        if self.nodes[self.selected].in_cart < 0 then
+          self.nodes[self.selected].in_cart = 0
+        end
+      end
+   elseif action_id == hash("walk-right") and action.pressed then
+      if self.selected <= #self.nodes then
+        self.nodes[self.selected].in_cart = self.nodes[self.selected].in_cart + 1
+        if cart_cost(self) > state.money then
+           self.nodes[self.selected].in_cart = self.nodes[self.selected].in_cart - 1
+        end
+      end
+   elseif action_id == hash("ui-submit") and action.pressed then
+      if self.selected > #self.nodes then
+         state.money = state.money - cart_cost(self)
+         add_seeds_to_state(self)
+         msg.post("default:/controller", "load_game")
+      end
+   end
+   update_selected(self)
+end

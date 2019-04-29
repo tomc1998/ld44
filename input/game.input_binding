@@ -26,6 +26,26 @@ key_trigger {
   input: KEY_L
   action: "harvest"
 }
+key_trigger {
+  input: KEY_SPACE
+  action: "ui-submit"
+}
+key_trigger {
+  input: KEY_J
+  action: "ui-submit"
+}
+key_trigger {
+  input: KEY_K
+  action: "ui-submit"
+}
+key_trigger {
+  input: KEY_ENTER
+  action: "ui-submit"
+}
+key_trigger {
+  input: KEY_L
+  action: "ui-submit"
+}
 mouse_trigger {
   input: MOUSE_BUTTON_1
   action: "touch"

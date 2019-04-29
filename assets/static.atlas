@@ -1,6 +1,15 @@
 images {
   image: "/assets/sprites/selection.png"
 }
+images {
+  image: "/assets/ui/shop-box.png"
+}
+images {
+  image: "/assets/ui/minus.png"
+}
+images {
+  image: "/assets/ui/plus.png"
+}
 margin: 0
 extrude_borders: 0
 inner_padding: 0

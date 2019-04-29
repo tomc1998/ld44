@@ -39,7 +39,7 @@ function harvest(self)
    if self.bush_growth < 3 then return end
    local multiplier = 1
    if math.floor(self.bush_growth) == 3 then multiplier = 0.5 end
-   state.money = state.money + get_bush_value(self.bush_type) * multiplier
+   state:earn_money(get_bush_value(self.bush_type) * multiplier)
    go.delete(self.bush)
    self.bush = nil
    self.bush_type = nil

@@ -1,0 +1,27 @@
+local state = require "main.state"
+
+function init(self)
+   state.money = state.money - 100
+   gui.set_text(gui.get_node("earnings"), tostring(state.earnings) .. " $")
+   gui.set_text(gui.get_node("carry_over"), tostring(state.carry_over) .. " $")
+   gui.set_text(gui.get_node("total"), tostring(state.money) .. " $")
+   if state.money < 0 then
+      gui.set_color(gui.get_node("total"), vmath.vector3(1, 0, 0))
+   else
+      gui.set_color(gui.get_node("total"), vmath.vector3(0, 1, 0))
+   end
+   if state.earnings == 0 then gui.set_color(gui.get_node("earnings"), vmath.vector3(1, 1, 1)) end
+   if state.carry_over == 0 then gui.set_color(gui.get_node("carry_over"), vmath.vector3(1, 1, 1)) end
+   msg.post(".", "acquire_input_focus")
+end
+
+function on_input(self, action_id, action)
+   if action.pressed then
+      if state.money < 0 then
+         msg.post("default:/controller", "load_game_over")
+      else
+         msg.post("default:/controller", "load_shop")
+      end
+   end
+end
+
