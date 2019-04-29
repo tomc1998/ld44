@@ -3,7 +3,7 @@ local direction = require "main.direction"
 local render_m = require "main.render"
 local constants = require "main.constants"
 
-local WALK_SPEED = 60
+local WALK_SPEED = 25
 
 function on_input(self, action_id, action)
    if action_id == hash("walk-left") then self.vx = -WALK_SPEED
